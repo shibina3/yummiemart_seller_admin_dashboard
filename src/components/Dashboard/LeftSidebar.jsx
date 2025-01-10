@@ -30,7 +30,7 @@ const LeftSidebar = React.memo(({ userType }) => {
         padding: "20px",
       }}
     >
-      {userType === "seller" ? (
+      {userType === "admin" ? (
         <>
           <NavLink to="/verify-sellers" style={({ isActive }) => getNavLinkStyle(isActive)}>
             Verify Sellers
