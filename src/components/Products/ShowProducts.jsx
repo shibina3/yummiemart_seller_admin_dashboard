@@ -1,5 +1,6 @@
 import React,{useEffect, useState, useContext} from "react";
 import { UserContext } from "../../Context/UserContext";
+import DeleteIcon from '../../assets/Delete.svg';
 
 const ShowProducts = () => {
   // Random product list
@@ -45,27 +46,27 @@ const ShowProducts = () => {
 
   const mobile = localStorage.getItem("mobile");
 
-  const getProducts = async () => {
-    try {
-      const response = await fetch("http://localhost:4000/get/products/for/seller", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ mobile: mobile }),
-      });
-      const data = await response.json();
-      setProductList(data);
-    } catch (error) {
-      console.error("Error fetching products: ", error);
-    }
-  }
+  // const getProducts = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:4000/get/products/for/seller", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ mobile: mobile }),
+  //     });
+  //     const data = await response.json();
+  //     setProductList(data);
+  //   } catch (error) {
+  //     console.error("Error fetching products: ", error);
+  //   }
+  // }
 
-  useEffect(() => {
-    if (userType !== null) {
-      getProducts();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (userType !== null) {
+  //     getProducts();
+  //   }
+  // }, []);
 
   return (
     <div
@@ -122,7 +123,10 @@ const ShowProducts = () => {
             {product.description}
           </p>
           {/* add status text */}
-            <p style={{ color: "green", fontWeight: "bold" }}>Verified</p>
+          <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+            <p style={{ color: "green", fontWeight: "bold", marginBottom: "0px" }}>Accepted</p>
+            <img src={DeleteIcon} alt="Delete" width={24} height={24} style={{cursor : "pointer"}}/>
+            </div>
         </div>
       ))}
     </div>

@@ -3,7 +3,7 @@ import { UserContext } from '../Context/UserContext';
 import AdminDashboard from './AdminDashboard';
 
 export default function Home() {
-    const { userType, setUserType, setCategories } = useContext(UserContext);
+    const { userType, setUserType, setCategories, setStores } = useContext(UserContext);
 
     useEffect(() => {
         const fetchDetails = async () => {
@@ -24,8 +24,25 @@ export default function Home() {
                 console.error("Error fetching data: ", error);
             }
         };
+
         fetchDetails();
     }, []); 
+
+                  // get all stores from the server
+                  const getAllStores = async () => {
+                    try {
+                      const response = await fetch("http://localhost:4000/get/stores", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                      });
+                      const data = await response.json();
+                      setStores(data);
+                    } catch (error) {
+                      console.error("Error fetching stores: ", error);
+                    }
+                  };
     
     const fetchCategories = async () => {
         try {
@@ -45,6 +62,7 @@ export default function Home() {
     useEffect(() => {
         if (userType !== null) {
             fetchCategories();
+            getAllStores();
         }
     }, [userType]); 
     

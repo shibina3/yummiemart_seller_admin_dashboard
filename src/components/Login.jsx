@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [mobile, setMobile] = useState("");
@@ -6,6 +7,7 @@ function Login() {
   const [isOtpEnabled, setIsOtpEnabled] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [showAlert, setShowAlert] = useState(false);
+  const navigate = useNavigate();
 
   const sendOTP = () => {
     // Logic to send OTP
@@ -24,9 +26,11 @@ function Login() {
         body: JSON.stringify({ mobile, otp }),
     });
     const data = await response.json();
+    console.log("Login response:", data);
     if( ["seller", "admin"].includes(data.userType) && !data.isNewUser ) {
         console.log("Logged in with OTP:", otp);
         localStorage.setItem("mobile", mobile);
+        navigate("/verify-sellers");
     } else {
         alert("You are not authorized to login! Install the app and Become a Seller or Admin.");
     }

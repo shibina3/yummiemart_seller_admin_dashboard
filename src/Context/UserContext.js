@@ -4,13 +4,16 @@ export const UserContext = createContext({
     userType: null,
     setUserType: () => {},
     categories: [],
-    setCategories: () => {}
+    setCategories: () => {},
+    stores: [],
+    setStores: () => {}
 });
 
 
 export const UserProvider = ({ children }) => {
   const [userType, setUserType] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [stores, setStores] = useState([]);
   //const [userDetails, setUserDetails] = useState({}); 
 
   const value = useMemo(
@@ -18,9 +21,11 @@ export const UserProvider = ({ children }) => {
       userType,
       setUserType,
         categories,
-        setCategories
+        setCategories,
+        stores,
+        setStores
     }),
-    [userType,categories]
+    [userType,categories, stores]
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

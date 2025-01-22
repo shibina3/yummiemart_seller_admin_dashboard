@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from "react";
+import { UserContext } from "../../Context/UserContext";
+import "./ProductVerifySimplified.css"; // For styles
+import Select from "react-select";
+import { ReactComponent as DeleteIcon }from '../../assets/Delete.svg';
 
-const ProductVerify = ({products}) => {
-  const [expandedAccordionIndex, setExpandedAccordionIndex] = useState(null);
+
+const ProductVerifySimplified = ({ products }) => {
   const [productStatuses, setProductStatuses] = useState({});
   const [showPopup, setShowPopup] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState('');
+  const [rejectionReason, setRejectionReason] = useState("");
   const [currentRejectIndex, setCurrentRejectIndex] = useState(null);
-
-  const toggleAccordion = (index) => {
-    setExpandedAccordionIndex(index === expandedAccordionIndex ? null : index);
-  };
+    const [selectedOption, setSelectedOption] = useState({ value: "all", label: "all" });
+    const [storeOption, setStoreOption] = useState({value : "1" , label : "Saravana Stores"})
+      const [allProducts, setAllProducts] = useState([]); // Backup of all products
+     const { categories, stores } = useContext(UserContext);
 
   const handleAccept = (index) => {
     setProductStatuses((prevState) => ({
       ...prevState,
-      [index]: true,
+      [index]: "Accepted",
     }));
   };
 
@@ -27,92 +31,181 @@ const ProductVerify = ({products}) => {
     if (rejectionReason.trim()) {
       setProductStatuses((prevState) => ({
         ...prevState,
-        [currentRejectIndex]: false,
+        [currentRejectIndex]: "Rejected",
       }));
       setShowPopup(false);
-      setRejectionReason('');
+      setRejectionReason("");
     }
   };
 
   const closePopup = () => {
     setShowPopup(false);
-    setRejectionReason('');
+    setRejectionReason("");
   };
 
-  return (
-    <div style={styles.container}>
-      {products.length > 0 ? (
+  const options = [
+    { value: "all", label: "all" }, // Manual option
+    ...categories.map((category) => ({
+      value: category.id,
+      label: category.name,
+    })),
+  ];
+
+  const storeOptions = stores?.length > 0 
+  ? stores.map((category) => ({
+      value: category.id,
+      label: category.name,
+    }))
+  : [{ value: "1", label: "Saravana Stores"}];
+
+  const handleSelectChange = (option) => {
+    setSelectedOption(option);
+  };
+
+  const handleStoreSelectChange = (option) => {
+    setStoreOption(option);
+    // Filter products by store
+    // const storeFilteredProducts = allProducts.filter(
+    //   (product) => product.store_id === option.value.toString()
+    // );
+    //setProductList(storeFilteredProducts);
+  };
+
+  return <>
+    <div
+    style={{
+      padding: "20px",
+      backgroundColor: "#f8f9fa",
+      borderBottom: "1px solid #dee2e6",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    }}
+  >
+    <h2
+      style={{
+        margin: 0,
+        fontSize: "24px",
+        fontWeight: "bold",
+        color: "#333",
+      }}
+    >
+      {selectedOption && selectedOption.label !== 'all' ? selectedOption.label : "All Products"}
+    </h2>
+<div           style={{
+        display : 'flex',
+        alignItems: 'center',
+        gap : '20px'
+      }}>
+<Select
+      options={storeOptions}
+      value={storeOption}
+      onChange={handleStoreSelectChange}
+      placeholder="Filter by store"
+      styles={{
+        control: (provided) => ({
+          ...provided,
+          minWidth: "250px",
+        }),
+      }}
+    />
+    <Select
+      options={options}
+      value={selectedOption}
+      onChange={handleSelectChange}
+      placeholder="Filter by category"
+      styles={{
+        control: (provided) => ({
+          ...provided,
+          minWidth: "250px",
+        }),
+      }}
+    />
+</div>
+  </div>
+
+    <div className="product-container">
+      {products?.length ? (
         products.map((product, index) => (
-          <div key={index} style={styles.section}>
-            <div style={styles.header} onClick={() => toggleAccordion(index)}>
-              <span style={styles.headerText}>{product.name}</span>
+          <div className="product-card" key={index}>
+            <img
+              src="https://www.shutterstock.com/shutterstock/photos/2402573215/display_1500/stock-photo-udine-italy-december-nutella-jar-of-chocolate-spreadable-cream-isolated-white-background-2402573215.jpg"
+              alt={product.name}
+              className="product-image"
+            />
+          <div className="nameAndType">
+          <h3 className="product-name">{product.name}</h3>
+                      <DeleteIcon style={{ fill: '#FF7300', width: '20px', height: '20px', cursor: 'pointer' }} />
+          
+          </div>
+          <p className="product-description" style={{                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 3,
+                marginTop: 10}}>{product.description}</p>
+          <div className="nameAndType" style={{marginTop: '10px'}}>
+            <p className="product-address">{product.address}</p>
+            <p className="product-description">{product.seller_type}</p>
             </div>
-            {expandedAccordionIndex === index && (
-              <div style={styles.content}>
-                <div style={styles.card}>
-                  <img src={product.image_url} alt={product.name} style={styles.image} />
-                  <div style={styles.cardDetails}>
-                    <div><strong>Address:</strong> {product.address}</div>
-                    <div><strong>Rating:</strong> {product.rating}</div>
-                    <div><strong>Reviews:</strong> {product.reviews}</div>
-                    <div style={styles.buttonContainer}>
-                      <button
-                        style={{
-                          ...styles.button,
-                          backgroundColor: productStatuses[index] === true ? 'gray' : 'green',
-                          cursor: productStatuses[index] === true ? 'not-allowed' : 'pointer',
-                        }}
-                        onClick={() => handleAccept(index)}
-                        disabled={productStatuses[index] === true}
-                      >
-                        Accept
-                      </button>
-                      <button
-                        style={{
-                          ...styles.button,
-                          backgroundColor: productStatuses[index] === false ? 'gray' : 'red',
-                          cursor: productStatuses[index] === false ? 'not-allowed' : 'pointer',
-                        }}
-                        onClick={() => handleRejectClick(index)}
-                        disabled={productStatuses[index] === false}
-                      >
-                        Reject
-                      </button>
-                    </div>
-                    <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                      {productStatuses[index] === true && (
-                        <span style={{ color: 'green', fontWeight: 'bold' }}>Accepted</span>
-                      )}
-                      {productStatuses[index] === false && (
-                        <span style={{ color: 'red', fontWeight: 'bold' }}>Rejected</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <div className="nameAndType" style={{margin: '10px 0px 10px 0px'}}>
+            <h3 className="product-price">₹ {product.price}</h3>
+            <h3 className="product-price" style={{textDecoration : 'line-through'}}>₹ {product.price}</h3>
+            </div>
+            <div className="product-actions">
+              <button
+                className={`btn accept-btn ${
+                  productStatuses[index] === "Accepted" && "disabled"
+                }`}
+                onClick={() => handleAccept(index)}
+                disabled={productStatuses[index] === "Accepted"}
+              >
+                Accept
+              </button>
+              <button
+                className={`btn reject-btn ${
+                  productStatuses[index] === "Rejected" && "disabled"
+                }`}
+                onClick={() => handleRejectClick(index)}
+                disabled={productStatuses[index] === "Rejected"}
+              >
+                Reject
+              </button>
+              <p
+              className={`product-status ${
+                productStatuses[index] === "Accepted"
+                  ? "accepted"
+                  : "rejected"
+              }`}
+            >
+              {productStatuses[index] || ""}
+            </p>
+            </div>
           </div>
         ))
       ) : (
-        <div>No products to verify</div>
+        <p>No products available.</p>
       )}
 
       {showPopup && (
-        <div style={styles.popupOverlay}>
-          <div style={styles.popup}>
-            <h3 style={styles.popupTitle}>Reason for Rejection</h3>
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3>Reason for Rejection</h3>
             <input
               type="text"
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="Enter reason"
-              style={styles.input}
+              className="popup-input"
             />
-            <div style={styles.popupButtonContainer}>
-              <button style={styles.popupButton} onClick={handleRejectConfirm} disabled={!rejectionReason.trim()}>
+            <div className="popup-actions">
+              <button
+                className="btn submit-btn"
+                onClick={handleRejectConfirm}
+                disabled={!rejectionReason.trim()}
+              >
                 Submit
               </button>
-              <button style={styles.popupButtonCancel} onClick={closePopup}>
+              <button className="btn cancel-btn" onClick={closePopup}>
                 Cancel
               </button>
             </div>
@@ -120,116 +213,7 @@ const ProductVerify = ({products}) => {
         </div>
       )}
     </div>
-  );
+    </>
 };
 
-const styles = {
-  container: {
-    margin: '20px',
-  },
-  section: {
-    marginBottom: '10px',
-    border: '1px solid #e0e0e0',
-    borderRadius: '8px',
-    backgroundColor: '#fff',
-  },
-  header: {
-    padding: '16px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    cursor: 'pointer',
-  },
-  headerText: {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  content: {
-    padding: '16px',
-    backgroundColor: '#f9f9f9',
-  },
-  card: {
-    display: 'flex',
-    gap: '20px',
-    alignItems: 'center',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    padding: '10px',
-    marginBottom: '10px',
-  },
-  image: {
-    width: '100px',
-    height: '100px',
-    borderRadius: '8px',
-  },
-  cardDetails: {
-    flex: 1,
-  },
-  buttonContainer: {
-    display: 'flex',
-   gap: '10px',
-    marginTop: '10px',
-  },
-  button: {
-    border: 'none',
-    color: 'white',
-    padding: '8px 16px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-  popupOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  popup: {
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    width: '400px',
-    textAlign: 'center',
-  },
-  popupTitle: {
-    marginBottom: '16px',
-  },
-  input: {
-    width: "370px",
-    padding: '10px',
-    marginBottom: '16px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-  },
-  popupButtonContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '10px',
-  },
-  popupButton: {
-    backgroundColor: 'red',
-    color: 'white',
-    padding: '8px 16px',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-  popupButtonCancel: {
-    backgroundColor: 'gray',
-    color: 'white',
-    padding: '8px 16px',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
-};
-
-export default ProductVerify;
+export default ProductVerifySimplified;

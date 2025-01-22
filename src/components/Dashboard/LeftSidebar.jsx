@@ -22,15 +22,21 @@ const LeftSidebar = React.memo(({ userType }) => {
   const getNavLinkStyle = (isActive) =>
     isActive || location.pathname === "/" ? { ...baseStyle, ...activeStyle } : baseStyle;
 
+  const handleLogout = () => {
+  localStorage.removeItem("mobile");
+  window.location.href = "/";
+  }
+
   return (
     <div
       style={{
         width: "300px",
         backgroundColor: "#FFD9BA",
         padding: "20px",
+        position:'relative'
       }}
     >
-      {userType === "admin" ? (
+      {userType === "seller" ? (
         <>
           <NavLink to="/verify-sellers" style={({ isActive }) => getNavLinkStyle(isActive)}>
             Verify Sellers
@@ -43,6 +49,18 @@ const LeftSidebar = React.memo(({ userType }) => {
           <NavLink to="/create-category" style={({ isActive }) => getNavLinkStyle(isActive)}>
             Create Category
           </NavLink>
+          
+          <NavLink to="/all-products" style={({ isActive }) => getNavLinkStyle(isActive)}>
+            All Products
+          </NavLink>
+                    
+          <NavLink to="/delivery-partner" style={({ isActive }) => getNavLinkStyle(isActive)}>
+            Delivery partner
+          </NavLink>
+                    
+          <NavLink to="/activity-logs" style={({ isActive }) => getNavLinkStyle(isActive)}>
+            Activity logs
+          </NavLink>
         </>
       ) : userType === "seller" ? (
 <>
@@ -54,8 +72,26 @@ const LeftSidebar = React.memo(({ userType }) => {
               </NavLink>
 </>
       ) : null}
+      <div style={{
+        backgroundColor: 'rgb(8, 86, 175)',
+        padding : '3px 0px 3px 0px',
+        position: 'absolute',
+        bottom : 0,
+        left : 0,
+        width : '100%',
+        textAlign: 'center',
+        color : 'white',
+        cursor: 'pointer'
+      }} onClick={handleLogout}>Logout</div>
     </div>
   );
 });
 
 export default LeftSidebar;
+
+
+// Edit Category Flow: Review and improve the process for editing categories.
+// Verify Products List: Ensure all seller-submitted products undergo proper verification.
+// Get Seller Details API: Enhance the API to include additional information, such as certificate images.
+// Image Issue: Address the issue where images from the backend are not displaying on the client side due to URLs starting with an IP address.
+// Verified Sellers List: Implement a feature to retrieve and display a list of verified sellers.

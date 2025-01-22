@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useContext } from "react";
+import AWS from 'aws-sdk';
 import { UserContext } from "../../Context/UserContext";
 
 const Categories = ({fetchCategories}) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(null);
+  const [file, setFile] = useState(null);
   const {  categories } = useContext(UserContext);
+  const [loading, setLoading] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(categories.map(() => false));
+
 
   const handleAddNew = () => {
     setIsPopupOpen(true);
@@ -16,7 +21,10 @@ const Categories = ({fetchCategories}) => {
     setCurrentCategory(category);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, index) => {
+    const updatedLoading = [...deleteLoading];
+    updatedLoading[index] = true;
+    setDeleteLoading(updatedLoading);
     try {
         const response = await fetch("http://localhost:4000/delete/category", {
             method: "DELETE",
@@ -26,6 +34,9 @@ const Categories = ({fetchCategories}) => {
             body: JSON.stringify({ id }),
           });
           if(response.status === 200) {
+            const updatedLoading = [...deleteLoading];
+            updatedLoading[index] = false;
+            setDeleteLoading(updatedLoading);
             alert("Category deleted successfully");
             fetchCategories();
           }
@@ -34,17 +45,39 @@ const Categories = ({fetchCategories}) => {
   };
 }
 
-const handleSubmit = (e) => {
+    const uploadImageToS3 = async (file) => {
+        const s3 = new AWS.S3({
+            accessKeyId: "AKIASFIXCT2YTIXF5453",
+            secretAccessKey: "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",
+            region: 'us-east-1',
+        });
+        const params = {
+            Bucket: 'yummiemart.in',
+            Key: `uploads/stores/${1}/products/${file.name}`,
+            Body: file,
+            ContentType : file.type,
+        };
+        return s3.upload(params).promise();
+    }
+
+    const singleFileUpload = async (file) => {
+        return uploadImageToS3(file);
+    }
+
+const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    const uploadedFile = await singleFileUpload(file);
     const formData = new FormData(e.target);
     const newCategory = {
       name: formData.get("name"),
       description : formData.get("description"),
-      image_url: "https://w7.pngwing.com/pngs/375/167/png-transparent-chocolate-spread-nutella-hazelnut-ferrero-spa-chocolate-natural-foods-food-grocery-store-thumbnail.png",
+      image_url: uploadedFile,
     };
 
     if (currentCategory) {
         newCategory.id = currentCategory.id;
+        newCategory.image_url = currentCategory.image_url
         try {
             const response = fetch("http://localhost:4000/update/category", {
                 method: "PUT",
@@ -53,22 +86,25 @@ const handleSubmit = (e) => {
                 },
                 body: JSON.stringify(newCategory),
             });
-            console.log(response);
+            setLoading(false);
             setIsPopupOpen(false);
+            alert('Category edited successfully')
             fetchCategories();
         } catch (error) {
             console.error("Error: ", error);
     }
   }else{
     try {
-        const response = fetch("http://localhost:4000/create/category", {
+        const response = await fetch("http://localhost:4000/create/category", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(newCategory),
           });
+          setLoading(false);
           setIsPopupOpen(false);
+          alert('Category created successfully')
           fetchCategories();
     } catch (error) {
         console.error("Error: ", error);
@@ -95,7 +131,7 @@ const handleSubmit = (e) => {
       </button>
 
       <ul style={{ listStyleType: "none", padding: 0 }}>
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <li
             key={category.id}
             style={{
@@ -125,7 +161,7 @@ const handleSubmit = (e) => {
                 Edit
               </button>
               <button
-                onClick={() => handleDelete(category.id)}
+                onClick={() => handleDelete(category.id, index)}
                 style={{
                   padding: "5px 10px",
                   background: "#FF7300",
@@ -135,7 +171,7 @@ const handleSubmit = (e) => {
                   cursor: "pointer",
                 }}
               >
-                Delete
+                {deleteLoading[index] ? 'Please wait...' : 'Delete'}
               </button>
             </div>
           </li>
@@ -205,6 +241,7 @@ const handleSubmit = (e) => {
                   type="file"
                   name="image"
                   placeholder="Category Image"
+                  onChange={(e) => setFile( e.target.files[0])}
                   style={{
                     width: "100%",
                     padding: "8px",
@@ -242,7 +279,7 @@ const handleSubmit = (e) => {
                   cursor: "pointer",
                 }}
               >
-                Submit
+                {loading ? 'Please wait...' : 'Submit'}
               </button>
             </div>
           </form>

@@ -1,0 +1,23 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 10px 15px;
+    text-align: left;
+  }
+  
+  th {
+    background: #f1f1f1;
+    font-weight: bold;
+  }
+  
+  tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+  
+  button {
+    cursor: pointer;
+  }
+  
