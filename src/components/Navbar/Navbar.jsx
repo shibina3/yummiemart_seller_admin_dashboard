@@ -5,11 +5,11 @@ const Navbar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-logo">
-                <a href="/">YummyMart</a>
+                <a href="/">Yummie Mart</a>
             </div>
 
             <div className="navbar-user">
-                <p>Abdul rahman</p>
+                <p>{localStorage.getItem("userName")}</p>
             </div>
         </nav>
     );

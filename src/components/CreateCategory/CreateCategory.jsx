@@ -26,14 +26,14 @@ const Categories = ({fetchCategories}) => {
     updatedLoading[index] = true;
     setDeleteLoading(updatedLoading);
     try {
-        const response = await fetch("http://localhost:4000/delete/category", {
+        const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ id }),
+            body: JSON.stringify({ id, path: "/delete/category" }),
           });
-          if(response.status === 200) {
+          if(response.statusCode === 200) {
             const updatedLoading = [...deleteLoading];
             updatedLoading[index] = false;
             setDeleteLoading(updatedLoading);
@@ -78,8 +78,9 @@ const handleSubmit = async (e) => {
     if (currentCategory) {
         newCategory.id = currentCategory.id;
         newCategory.image_url = currentCategory.image_url
+        newCategory.path = '/update/category';
         try {
-            const response = fetch("http://localhost:4000/update/category", {
+            fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
                 method: "PUT",
                 headers: {
                 "Content-Type": "application/json",
@@ -94,8 +95,9 @@ const handleSubmit = async (e) => {
             console.error("Error: ", error);
     }
   }else{
+    newCategory.path = '/create/category';
     try {
-        const response = await fetch("http://localhost:4000/create/category", {
+        await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

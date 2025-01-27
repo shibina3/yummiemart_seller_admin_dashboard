@@ -18,15 +18,15 @@ const VerifySeller = () => {
 
  const handleAcceptApiCall = async (seller, index) => {
   try {
-    const response = await fetch('http://localhost:4000/accept/seller', {
+    const response = await fetch('https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ mobile: seller.phone_number }),
+      body: JSON.stringify({ mobile: seller.phone_number, path: '/accept/seller' }),
     });
-    const data = await response.json();
-    if (data.success) {
+    const {body} = await response.json();
+    if (body.success) {
       console.log('Seller accepted successfully');
         }
   } catch (error) {
@@ -41,15 +41,15 @@ const VerifySeller = () => {
   const handleRejectConfirm = async () => {
  const mobile = localStorage.getItem("mobile");
     try{
-    const response = await fetch('http://localhost:4000/reject/seller', {
+    const response = await fetch('https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ mobile: mobile, comments: rejectionReason }),
+      body: JSON.stringify({ mobile: mobile, comments: rejectionReason, path: '/reject/seller' }),
     });
-    const data = await response.json();
-    if (data.success) {
+    const {body} = await response.json();
+    if (body.success) {
       setShowPopup(false);
       setRejectionReason("");
     }
@@ -71,14 +71,15 @@ const VerifySeller = () => {
 
   const getSellerDetails = async () => {
     try {
-      const response = await fetch("http://localhost:4000/get/submitted-sellers", {
+      const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ path: "/get/submitted-sellers" }),
       });
-      const data = await response.json();
-      setSellerData(data);
+      const {body} = await response.json();
+      setSellerData(body);
     } catch (error) {
       console.error("Error: ", error);
     }

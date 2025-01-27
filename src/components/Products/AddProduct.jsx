@@ -59,14 +59,14 @@ const AddProduct = () => {
     };
 
     try{
-        const response = await fetch("http://localhost:4000/create/product", {
+        newProduct.path = '/create/product';
+        await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
             method: "POST",
             headers: {
             "Content-Type": "application/json",
             },
             body: JSON.stringify(newProduct),
         });
-        console.log(response);
     }catch(error){
         console.error("Error: ", error);
     }

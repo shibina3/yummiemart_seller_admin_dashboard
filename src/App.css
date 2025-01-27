@@ -98,6 +98,14 @@ body {
   font-size: 18px;
 }
 
+.orange {
+  color: #ff7300;
+}
+
+.blue {
+  color: #2f80ed;
+}
+
 .login-button {
   margin-top: 20px;
   width: 90%;
@@ -134,4 +142,10 @@ body {
   padding: 10px 20px;
   border-radius: 4px;
   text-align: center;
+}
+
+.yummie-heading {
+  font-size: 32px;
+  color: #06161c;
+  margin-bottom: 0px;
 }

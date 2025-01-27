@@ -32,16 +32,16 @@ const AllProducts = ({ products }) => {
 
     const getProducts = async () => {
       try {
-        const response = await fetch("http://localhost:4000/get/products", {
+        const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-            body: JSON.stringify({ category: selectedOption.label }),
+            body: JSON.stringify({ category: selectedOption.label, path: "/get/products" }),
         });
-        const data = await response.json();
-        setAllProducts(data);
-        setProductList(data);
+        const {body} = await response.json();
+        setAllProducts(body);
+        setProductList(body);
       } catch (error) {
         console.error("Error fetching products: ", error);
       }
@@ -49,14 +49,14 @@ const AllProducts = ({ products }) => {
 
     const handleDelete = async (id, index) => {
       try {
-          const response = await fetch("http://localhost:4000/delete/product", {
+          const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
               method: "DELETE",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ id }),
+              body: JSON.stringify({ id, path: "/delete/product" }),
             });
-            if(response.status === 200) {
+            if(response.statusCode === 200) {
               alert("Category deleted successfully");
               getProducts();
             }

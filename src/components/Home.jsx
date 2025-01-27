@@ -9,17 +9,18 @@ export default function Home() {
         const fetchDetails = async () => {
             try {
                 const response = await fetch(
-                    `http://localhost:4000/get/user-type`,
+                    `https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default`,
                     {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({ mobile: localStorage.getItem("mobile") }),
+                        body: JSON.stringify({ mobile: localStorage.getItem("mobile"), path: "/get/user-type" }),
                     }
                 );
-                const data = await response.json();
-                setUserType(data.user_type);
+                const {body} = await response.json();
+                localStorage.setItem("userName", body.name);
+                setUserType(body.user_type);
             } catch (error) {
                 console.error("Error fetching data: ", error);
             }
@@ -31,14 +32,15 @@ export default function Home() {
                   // get all stores from the server
                   const getAllStores = async () => {
                     try {
-                      const response = await fetch("http://localhost:4000/get/stores", {
+                      const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
                         method: "POST",
                         headers: {
                           "Content-Type": "application/json",
                         },
+                        body: JSON.stringify({ path: "/get/stores" }),
                       });
-                      const data = await response.json();
-                      setStores(data);
+                      const {body} = await response.json();
+                      setStores(body);
                     } catch (error) {
                       console.error("Error fetching stores: ", error);
                     }
@@ -46,14 +48,15 @@ export default function Home() {
     
     const fetchCategories = async () => {
         try {
-            const response = await fetch("http://localhost:4000/get/categories", {
+            const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
+                body: JSON.stringify({ path: "/get/categories" }),
             });
-            const data = await response.json();
-            setCategories(data);
+            const {body} = await response.json();
+            setCategories(body);
         } catch (error) {
             console.error("Error: ", error);
         }

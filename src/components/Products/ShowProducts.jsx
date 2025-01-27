@@ -48,7 +48,7 @@ const ShowProducts = () => {
 
   // const getProducts = async () => {
   //   try {
-  //     const response = await fetch("http://localhost:4000/get/products/for/seller", {
+  //     const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default/get/products/for/seller", {
   //       method: "POST",
   //       headers: {
   //         "Content-Type": "application/json",

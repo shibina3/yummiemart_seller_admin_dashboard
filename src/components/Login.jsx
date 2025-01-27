@@ -18,17 +18,15 @@ function Login() {
   };
 
   const handleLogin = async () => {
-    const response = await fetch("http://localhost:4000/verify/otp", {
+    const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ mobile, otp }),
+        body: JSON.stringify({ mobile, otp, path: "/verify/otp" }),
     });
-    const data = await response.json();
-    console.log("Login response:", data);
-    if( ["seller", "admin"].includes(data.userType) && !data.isNewUser ) {
-        console.log("Logged in with OTP:", otp);
+    const { body } = await response.json();
+    if( ["seller", "admin"].includes(body.userType) && !body.isNewUser ) {
         localStorage.setItem("mobile", mobile);
         navigate("/verify-sellers");
     } else {
@@ -40,6 +38,7 @@ function Login() {
     <div className="login-page">
       {showAlert && <div className="alert-container">{alertMessage}</div>}
       <div className="login-container">
+      <h2 className="yummie-heading"><span className="orange">Yummie</span> <span className="blue">Mart</span></h2>
         <h2 className="heading">Login to Your Account</h2>
         <p className="description">
         Your gateway to seamless business management.
