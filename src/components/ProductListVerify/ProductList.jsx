@@ -41,8 +41,9 @@ const ProductVerifySimplified = ({ products }) => {
           body: JSON.stringify({ category: selectedOption.label, path: "/get/unverified/products" }),
       });
       const {body} = await response.json();
-      setAllProducts(body);
-      setProductList(body);
+      const data = body.filter((product) => product.verification_status !== "rejected");
+      setAllProducts(data);
+      setProductList(data);
     } catch (error) {
       console.error("Error fetching products: ", error);
     }

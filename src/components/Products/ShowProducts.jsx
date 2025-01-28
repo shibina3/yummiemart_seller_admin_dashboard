@@ -21,7 +21,7 @@ const ShowProducts = () => {
         body: JSON.stringify({ mobile: mobile,path: "/get/products/for/seller" }),
       });
       const data = await response.json();
-      setProductList(data);
+      setProductList(data.body);
     } catch (error) {
       console.error("Error fetching products: ", error);
     }
@@ -102,7 +102,7 @@ const ShowProducts = () => {
           );
 
   return (
-    <div>
+    <div className="d-flex flex-wrap align-items-center" style={{ gap: "20px" }}>
       {productList.length === 0 ? (
         <p>You have not added any products yet.</p>
       ) : (
