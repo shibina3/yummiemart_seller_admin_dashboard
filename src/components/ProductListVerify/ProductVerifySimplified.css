@@ -9,6 +9,7 @@
   
   .product-card {
     width: 300px;
+    height: 604px;
     padding: 16px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -23,6 +24,7 @@
   }
   
   .product-name {
+    width: 80%;
     font-size: 18px;
     font-weight: bold;
     margin: 0 0 0px;
@@ -67,10 +69,20 @@
   
   .accept-btn {
     background-color: green;
+    color: white;
+    border: none;
+    outline: none;
+    border-radius: 6px;
+    padding: 8px 16px;
   }
   
   .reject-btn {
     background-color: red;
+    color: white;
+    border: none;
+    outline: none;
+    border-radius: 6px;
+    padding: 8px 16px;
   }
   
   .btn.disabled {

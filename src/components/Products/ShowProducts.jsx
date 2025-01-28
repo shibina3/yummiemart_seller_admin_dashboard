@@ -1,134 +1,219 @@
 import React,{useEffect, useState, useContext} from "react";
 import { UserContext } from "../../Context/UserContext";
-import DeleteIcon from '../../assets/Delete.svg';
+import { Popover, OverlayTrigger } from 'react-bootstrap';
 
 const ShowProducts = () => {
-  // Random product list
-  const products = [
-    {
-      id: 1,
-      name: "Chocolate Spread",
-      description: "Delicious chocolate spread perfect for breakfast and snacks.",
-      image: "https://via.placeholder.com/300x200.png?text=Chocolate+Spread",
-    },
-    {
-      id: 2,
-      name: "Organic Honey",
-      description:
-        "Pure organic honey sourced from the finest bee farms. Great for health.",
-        image: "https://via.placeholder.com/300x200.png?text=Chocolate+Spread",
-    },
-    {
-      id: 3,
-      name: "Green Tea",
-      description:
-        "Refreshing green tea packed with antioxidants to revitalize your day.",
-        image: "https://via.placeholder.com/300x200.png?text=Chocolate+Spread",
-    },
-    {
-      id: 4,
-      name: "Almond Butter",
-      description:
-        "Creamy almond butter made from premium almonds, rich in flavor.",
-        image: "https://via.placeholder.com/300x200.png?text=Chocolate+Spread",
-    },
-    {
-      id: 5,
-      name: "Granola Bars",
-      description:
-        "Healthy granola bars, perfect for on-the-go snacks and energy boosts.",
-        image: "https://via.placeholder.com/300x200.png?text=Chocolate+Spread",
-    },
-  ];
 
-  const [productList, setProductList] = useState(products);
+
+  const [productList, setProductList] = useState([]);
+  const [selectedData, setSelectedData] = useState(null);
   const { userType } = useContext(UserContext);
 
   const mobile = localStorage.getItem("mobile");
 
-  // const getProducts = async () => {
-  //   try {
-  //     const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default/get/products/for/seller", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ mobile: mobile }),
-  //     });
-  //     const data = await response.json();
-  //     setProductList(data);
-  //   } catch (error) {
-  //     console.error("Error fetching products: ", error);
-  //   }
-  // }
+  const getProducts = async () => {
+    try {
+      const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ mobile: mobile,path: "/get/products/for/seller" }),
+      });
+      const data = await response.json();
+      setProductList(data);
+    } catch (error) {
+      console.error("Error fetching products: ", error);
+    }
+  }
 
-  // useEffect(() => {
-  //   if (userType !== null) {
-  //     getProducts();
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (userType !== null) {
+      getProducts();
+    }
+  }, []);
+
+          const popover = (
+            <Popover id="custom-popover" style={{ maxWidth: '500px', width: '500px', inset: "0px auto 40px 0px",
+              height: "max-content" }}>
+              <Popover.Header as="h3" className="d-flex align-items-center justify-content-between">
+                {selectedData?.name || 'No Title'}
+                <img
+                src={'https://www.shutterstock.com/shutterstock/photos/2402573215/display_1500/stock-photo-udine-italy-december-nutella-jar-of-chocolate-spreadable-cream-isolated-white-background-2402573215.jpg'}
+                alt={selectedData?.name}
+                style={{
+                  width: "50px",
+                  height: "auto",
+                  borderRadius: "8px",
+                  marginBottom: "12px",
+                }}
+              />
+                </Popover.Header>
+              <Popover.Body>
+                {selectedData?.description || 'No Description Available'}
+                <br />
+  <div className="d-flex align-items-start justify-content-between mt-2">
+  <p className="mb-1">
+  store_id : <b>{selectedData?.store_id || 'N/A'}</b>
+  </p>
+  <p className="mb-1">
+  mrp : <b>{selectedData?.mrp || 'N/A'}</b>
+  </p>
+  </div>
+  
+  <div className="d-flex align-items-start justify-content-between">
+  <p className="mb-1">
+  yummy_price : <b>{selectedData?.yummy_price || 'N/A'}</b>
+  </p>
+  <p className="mb-1">
+  is_admin_verified : <b>{selectedData?.is_admin_verified || 'N/A'}</b>
+  </p>
+  </div>
+  
+  <div className="d-flex align-items-start justify-content-between">
+  <p className="mb-1">
+  allow_get_quote : <b>{selectedData?.allow_get_quote || 'N/A'}</b>
+  </p>
+  <p className="mb-1">
+  max_quantity : <b>{selectedData?.max_quantity || 'N/A'}</b>
+  </p>
+  </div>
+  
+  <div className="d-flex align-items-start justify-content-between">
+  <p className="mb-1">
+  min_quantity : <b>{selectedData?.min_quantity || 'N/A'}</b>
+  </p>
+  <p className="mb-1">
+  min_b2b_quantity : <b>{selectedData?.min_b2b_quantity || 'N/A'}</b>
+  </p>
+  </div>
+  
+  <div className="d-flex align-items-start justify-content-between">
+  <p className="mb-1">
+  admin_comments : <b>{selectedData?.admin_comments || 'N/A'}</b>
+  </p>
+  <p className="mb-1">
+  verification_status : <b>{selectedData?.verification_status || 'N/A'}</b>
+  </p>
+  </div>
+  
+              </Popover.Body>
+            </Popover>
+          );
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "16px",
-        justifyContent: "center",
-        padding: "20px",
-      }}
-    >
-      {productList.map((product) => (
-        <div
-          key={product.id}
-          style={{
-            width: "300px",
-            padding: "16px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            borderRadius: "8px",
-            backgroundColor: "#fff",
-          }}
-        >
-          <img
-            src={product.image}
-            alt={product.name}
+    <div>
+      {productList.length === 0 ? (
+        <p>You have not added any products yet.</p>
+      ) : (
+        productList.map((product, index) => (
+          <div
+            key={index}
             style={{
-              width: "100%",
-              height: "auto",
+              width: "300px",
+              padding: "16px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               borderRadius: "8px",
-              marginBottom: "12px",
-            }}
-          />
-          <h3
-            style={{
-              fontSize: "18px",
-              fontWeight: "bold",
-              margin: "0 0 8px",
-              color: "#333",
+              backgroundColor: "#fff",
             }}
           >
-            {product.name}
-          </h3>
-          <p
-            style={{
-              fontSize: "14px",
-              color: "#555",
-              lineHeight: "1.5",
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitBoxOrient: "vertical",
-              WebkitLineClamp: 3, // Ensures the text does not exceed three lines
-            }}
-          >
-            {product.description}
-          </p>
-          {/* add status text */}
-          <div style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-            <p style={{ color: "green", fontWeight: "bold", marginBottom: "0px" }}>Accepted</p>
-            <img src={DeleteIcon} alt="Delete" width={24} height={24} style={{cursor : "pointer"}}/>
+            <img
+              src="https://www.shutterstock.com/shutterstock/photos/2402573215/display_1500/stock-photo-udine-italy-december-nutella-jar-of-chocolate-spreadable-cream-isolated-white-background-2402573215.jpg"
+              alt={product.name}
+              style={{
+                width: "100%",
+                height: "auto",
+                borderRadius: "8px",
+                marginBottom: "12px",
+              }}
+            />
+            <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between' }}>
+              <h3
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "bold",
+                  margin: "0 0 8px",
+                  color: "#333",
+                }}
+              >
+                {product.name}
+              </h3>
             </div>
-        </div>
-      ))}
+            <p
+              style={{
+                fontSize: "14px",
+                color: "#555",
+                lineHeight: "1.5",
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 3,
+                marginTop: "10px",
+              }}
+            >
+              {product.description}
+            </p>
+            <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between' }}>
+              <h3
+                style={{
+                  fontSize: "18px",
+                  color: "black",
+                  lineHeight: "26px",
+                  marginTop: "10px",
+                  marginBottom: 0,
+                }}
+              >₹ {product.yummy_price}
+              </h3>
+              <h3
+                style={{
+                  fontSize: "18px",
+                  color: "#555",
+                  lineHeight: "26px",
+                  marginTop: "10px",
+                  marginBottom: 0,
+                  textDecoration: 'line-through'
+                }}
+              >₹ {product.mrp}
+              </h3>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between' }}>
+              <p
+                style={{
+                  fontSize: "16px",
+                  color: "#555",
+                  lineHeight: "26px",
+                  marginTop: "10px",
+                  marginBottom: 0,
+                  fontWeight: 500,
+                }}
+              >Stock :
+              </p>
+              <p
+                style={{
+                  fontSize: "16px",
+                  color: product.stock === 'in-stock' ? 'green' : 'red',
+                  lineHeight: "26px",
+                  marginTop: "10px",
+                  marginBottom: 0,
+                  fontWeight: 500,
+                  textDecoration: product.stock === 'in-stock' ? 'none' : 'line-through'
+                }}
+              >{product.stock}
+              </p>
+            </div>
+            <OverlayTrigger
+              trigger="click"
+              placement="bottom"
+              overlay={popover}
+              onToggle={() => setSelectedData(product)}
+            >
+              <div className="d-flex align-items-center justify-content-end mt-3 cursor-pointer">
+                <p style={{ color: "rgb(8, 86, 175)", cursor: "pointer" }}>Click here for more details</p>
+              </div>
+            </OverlayTrigger>
+          </div>
+        ))
+      )}
     </div>
   );
 };

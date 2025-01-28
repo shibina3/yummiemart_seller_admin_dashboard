@@ -51,7 +51,7 @@ const LeftSidebar = React.memo(({ userType }) => {
           </NavLink>
           
           <NavLink to="/all-products" style={({ isActive }) => getNavLinkStyle(isActive)}>
-            All Products
+            All Products (verified)
           </NavLink>
                     
           <NavLink to="/delivery-partner" style={({ isActive }) => getNavLinkStyle(isActive)}>

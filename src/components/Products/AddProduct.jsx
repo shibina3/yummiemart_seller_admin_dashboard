@@ -42,12 +42,14 @@ const AddProduct = () => {
     const formData = new FormData(e.target);
     const uploadedFile = await singleFileUpload(file);
     const uploadedFiles = await multipleFilesUpload(files);
+    const productImages = uploadedFiles.map(file => (file.Location ));
+    console.log("productImages: ", productImages);
     const newProduct = {
         name: formData.get("productName"),
         description: formData.get("description"),
         category_id : formData.get("categoryId"),
-        products_images : uploadedFiles,
-        allow_get_quote : formData.get("allowGetQuote"),
+        products_images : productImages,
+        allow_get_quote : null,
         stock : "in-stock",
         store_id : formData.get("storeId"),
         mrp: formData.get("originalPrice"),
@@ -55,7 +57,7 @@ const AddProduct = () => {
         max_quantity: formData.get("quantity"),
         min_quantity: formData.get("minQuantity"),
         min_b2b_quantity: formData.get("minB2bQuantity"),
-        thumbnail_image : uploadedFile
+        thumbnail_image : uploadedFile.Location
     };
 
     try{
@@ -67,6 +69,7 @@ const AddProduct = () => {
             },
             body: JSON.stringify(newProduct),
         });
+        alert("Product added successfully");
     }catch(error){
         console.error("Error: ", error);
     }
@@ -156,7 +159,7 @@ const stockDetails = [
           />
         </div>
 
-        <div style={{ marginBottom: "15px" }}>
+        {/* <div style={{ marginBottom: "15px" }}>
           <label>Allow get quote:</label>
           <input
             type="checkbox"
@@ -165,7 +168,7 @@ const stockDetails = [
             style={{padding: "8px", margin: "10px", boxSizing : "border-box" }}
             required
           />
-        </div>
+        </div> */}
 
 <div style={{ marginBottom: "15px" }}> 
 <label>Max Quantity:</label>

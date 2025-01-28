@@ -9,7 +9,7 @@ import AllProducts from "../Products/AllProducts";
 import DeliveryPartner from "../DeliveryPartner/DeliveryPartner";
 import ActivityLogs from "../ActivityLogs/ActivityLogs";
 
-const RightSidebar = ({userType, fetchCategories}) => {
+const RightSidebar = ({userType, fetchCategories, setCategories}) => {
 
   const products = [
     {
@@ -46,7 +46,7 @@ const RightSidebar = ({userType, fetchCategories}) => {
 
 const VerifySellers = () => <VerifySeller />;
 const VerifyProducts = () => <ProductList products={products}/>;
-const CreateCategory = () => <CreateCategoryForm fetchCategories={fetchCategories}/>;
+const CreateCategory = () => <CreateCategoryForm fetchCategories={fetchCategories} />;
 const AllProductList = () => <AllProducts products={products}/>;
 
  return (
@@ -55,7 +55,7 @@ const AllProductList = () => <AllProducts products={products}/>;
         width:  "calc(100% - 300px)" ,
         padding: "20px",
         backgroundColor: "#FFF5E4",
-        height: "Calc(100vh - 120px)",
+        height: "Calc(100vh - 80px)",
         overflowY: "scroll"
       }}
     >

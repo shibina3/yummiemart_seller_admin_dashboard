@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import AWS from 'aws-sdk';
 import { UserContext } from "../../Context/UserContext";
 
@@ -16,24 +16,31 @@ const Categories = ({fetchCategories}) => {
     setCurrentCategory(null);
   };
 
+  const getFileNameFromURL = (url) => {
+    const segments = url.split('/');
+    return segments[segments.length - 1].replace(/%20/g, ' ');
+  };
+  
   const handleEdit = (category) => {
     setIsPopupOpen(true);
-    setCurrentCategory(category);
+    const fileName = getFileNameFromURL(category.image_url);
+    setCurrentCategory({ ...category, fileName: fileName});
   };
-
+  
   const handleDelete = async (id, index) => {
     const updatedLoading = [...deleteLoading];
     updatedLoading[index] = true;
     setDeleteLoading(updatedLoading);
     try {
         const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
-            method: "DELETE",
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ id, path: "/delete/category" }),
           });
-          if(response.statusCode === 200) {
+          console.log(response);
+          if(response.status === 200) {
             const updatedLoading = [...deleteLoading];
             updatedLoading[index] = false;
             setDeleteLoading(updatedLoading);
@@ -68,20 +75,20 @@ const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     const uploadedFile = await singleFileUpload(file);
+    console.log(uploadedFile);
     const formData = new FormData(e.target);
     const newCategory = {
       name: formData.get("name"),
       description : formData.get("description"),
-      image_url: uploadedFile,
+      image_url: uploadedFile ? uploadedFile.Location : currentCategory.image_url
     };
 
     if (currentCategory) {
         newCategory.id = currentCategory.id;
-        newCategory.image_url = currentCategory.image_url
         newCategory.path = '/update/category';
         try {
-            fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
-                method: "PUT",
+            await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
+                method: "POST",
                 headers: {
                 "Content-Type": "application/json",
                 },
@@ -90,7 +97,6 @@ const handleSubmit = async (e) => {
             setLoading(false);
             setIsPopupOpen(false);
             alert('Category edited successfully')
-            fetchCategories();
         } catch (error) {
             console.error("Error: ", error);
     }
@@ -107,11 +113,11 @@ const handleSubmit = async (e) => {
           setLoading(false);
           setIsPopupOpen(false);
           alert('Category created successfully')
-          fetchCategories();
     } catch (error) {
         console.error("Error: ", error);
     }
   };
+  fetchCategories();
 }
 
   return (
@@ -253,6 +259,14 @@ const handleSubmit = async (e) => {
                     boxSizing: "border-box",
                   }}
                 />
+                  {currentCategory !== null && currentCategory.fileName && (
+    <div style={{ marginTop: "5px" ,display:'flex', flexDirection:'row' }}>
+      <span>Current File: </span>
+      <p style={{color:"rgb(255, 115, 0)", marginBottom: 0, marginTop: 0,marginLeft: 10}} href={currentCategory.fileUrl}>
+        {currentCategory.fileName}
+      </p>
+    </div>
+  )}
             </div>
             <div style={{ textAlign: "right", marginTop: "16px" }}>
               <button

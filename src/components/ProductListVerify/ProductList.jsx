@@ -1,42 +1,74 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../../Context/UserContext";
 import "./ProductVerifySimplified.css"; // For styles
 import Select from "react-select";
 import { ReactComponent as DeleteIcon }from '../../assets/Delete.svg';
+import { Popover, OverlayTrigger } from 'react-bootstrap';
 
 
 const ProductVerifySimplified = ({ products }) => {
-  const [productStatuses, setProductStatuses] = useState({});
   const [showPopup, setShowPopup] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
-  const [currentRejectIndex, setCurrentRejectIndex] = useState(null);
     const [selectedOption, setSelectedOption] = useState({ value: "all", label: "all" });
     const [storeOption, setStoreOption] = useState({value : "1" , label : "Saravana Stores"})
       const [allProducts, setAllProducts] = useState([]); // Backup of all products
-     const { categories, stores } = useContext(UserContext);
+      const [productList, setProductList] = useState([]);
+      const [selectedData, setSelectedData] = useState(null);
+     const { categories, stores, userType } = useContext(UserContext);
 
-  const handleAccept = (index) => {
-    setProductStatuses((prevState) => ({
-      ...prevState,
-      [index]: "Accepted",
-    }));
+  const handleAccept = async (id) => {
+   try{
+    const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id, path: "/accept/product" }),
+    });
+    getProducts();
+   }catch(err){
+      console.error("Error accepting product: ", err);
+   }
   };
 
-  const handleRejectClick = (index) => {
-    setCurrentRejectIndex(index);
+  const getProducts = async () => {
+    try {
+      const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+          body: JSON.stringify({ category: selectedOption.label, path: "/get/unverified/products" }),
+      });
+      const {body} = await response.json();
+      setAllProducts(body);
+      setProductList(body);
+    } catch (error) {
+      console.error("Error fetching products: ", error);
+    }
+  };
+
+  const handleRejectClick = (id) => {
+    setSelectedData(id);
     setShowPopup(true);
   };
 
-  const handleRejectConfirm = () => {
-    if (rejectionReason.trim()) {
-      setProductStatuses((prevState) => ({
-        ...prevState,
-        [currentRejectIndex]: "Rejected",
-      }));
-      setShowPopup(false);
-      setRejectionReason("");
+  const handleRejectConfirm = async (id) => {
+    console.log("Rejecting product: ", id);
+    try {
+      const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id, path: "/reject/product", comments: rejectionReason }),
+      });
+      getProducts();
+      closePopup();
+    } catch (error) {
+      console.error("Error rejecting product: ", error);
     }
-  };
+  }
 
   const closePopup = () => {
     setShowPopup(false);
@@ -65,11 +97,85 @@ const ProductVerifySimplified = ({ products }) => {
   const handleStoreSelectChange = (option) => {
     setStoreOption(option);
     // Filter products by store
-    // const storeFilteredProducts = allProducts.filter(
-    //   (product) => product.store_id === option.value.toString()
-    // );
-    //setProductList(storeFilteredProducts);
+    const storeFilteredProducts = allProducts.filter(
+      (product) => product.store_id === option.value.toString()
+    );
+    setProductList(storeFilteredProducts);
   };
+
+  const popover = (
+    <Popover id="custom-popover" style={{ maxWidth: '500px', width: '500px', inset: "0px auto 40px 0px",
+      height: "max-content" }}>
+      <Popover.Header as="h3" className="d-flex align-items-center justify-content-between">
+        {selectedData?.name || 'No Title'}
+        <img
+        src={'https://www.shutterstock.com/shutterstock/photos/2402573215/display_1500/stock-photo-udine-italy-december-nutella-jar-of-chocolate-spreadable-cream-isolated-white-background-2402573215.jpg'}
+        alt={selectedData?.name}
+        style={{
+          width: "50px",
+          height: "auto",
+          borderRadius: "8px",
+          marginBottom: "12px",
+        }}
+      />
+        </Popover.Header>
+      <Popover.Body>
+        {selectedData?.description || 'No Description Available'}
+        <br />
+<div className="d-flex align-items-start justify-content-between mt-2">
+<p className="mb-1">
+store_id : <b>{selectedData?.store_id || 'N/A'}</b>
+</p>
+<p className="mb-1">
+mrp : <b>{selectedData?.mrp || 'N/A'}</b>
+</p>
+</div>
+
+<div className="d-flex align-items-start justify-content-between">
+<p className="mb-1">
+yummy_price : <b>{selectedData?.yummy_price || 'N/A'}</b>
+</p>
+<p className="mb-1">
+is_admin_verified : <b>{selectedData?.is_admin_verified || 'N/A'}</b>
+</p>
+</div>
+
+<div className="d-flex align-items-start justify-content-between">
+<p className="mb-1">
+allow_get_quote : <b>{selectedData?.allow_get_quote || 'N/A'}</b>
+</p>
+<p className="mb-1">
+max_quantity : <b>{selectedData?.max_quantity || 'N/A'}</b>
+</p>
+</div>
+
+<div className="d-flex align-items-start justify-content-between">
+<p className="mb-1">
+min_quantity : <b>{selectedData?.min_quantity || 'N/A'}</b>
+</p>
+<p className="mb-1">
+min_b2b_quantity : <b>{selectedData?.min_b2b_quantity || 'N/A'}</b>
+</p>
+</div>
+
+<div className="d-flex align-items-start justify-content-between">
+<p className="mb-1">
+admin_comments : <b>{selectedData?.admin_comments || 'N/A'}</b>
+</p>
+<p className="mb-1">
+verification_status : <b>{selectedData?.verification_status || 'N/A'}</b>
+</p>
+</div>
+
+      </Popover.Body>
+    </Popover>
+  );
+
+  useEffect(() => {
+    if (userType !== null) {
+        getProducts();
+    }
+    }, [selectedOption]);
 
   return <>
     <div
@@ -125,8 +231,8 @@ const ProductVerifySimplified = ({ products }) => {
   </div>
 
     <div className="product-container">
-      {products?.length ? (
-        products.map((product, index) => (
+      {productList?.length ? (
+        productList.map((product, index) => (
           <div className="product-card" key={index}>
             <img
               src="https://www.shutterstock.com/shutterstock/photos/2402573215/display_1500/stock-photo-udine-italy-december-nutella-jar-of-chocolate-spreadable-cream-isolated-white-background-2402573215.jpg"
@@ -148,38 +254,33 @@ const ProductVerifySimplified = ({ products }) => {
             <p className="product-description">{product.seller_type}</p>
             </div>
             <div className="nameAndType" style={{margin: '10px 0px 10px 0px'}}>
-            <h3 className="product-price">₹ {product.price}</h3>
-            <h3 className="product-price" style={{textDecoration : 'line-through'}}>₹ {product.price}</h3>
+            <h3 className="product-price">₹ {product.yummy_price}</h3>
+            <h3 className="product-price" style={{textDecoration : 'line-through'}}>₹ {product.mrp}</h3>
             </div>
             <div className="product-actions">
               <button
-                className={`btn accept-btn ${
-                  productStatuses[index] === "Accepted" && "disabled"
-                }`}
-                onClick={() => handleAccept(index)}
-                disabled={productStatuses[index] === "Accepted"}
+                className={`accept-btn`}
+                onClick={() => handleAccept(product.id)}
               >
                 Accept
               </button>
               <button
-                className={`btn reject-btn ${
-                  productStatuses[index] === "Rejected" && "disabled"
-                }`}
-                onClick={() => handleRejectClick(index)}
-                disabled={productStatuses[index] === "Rejected"}
+                className={`reject-btn`}
+                onClick={() => handleRejectClick(product.id)}
               >
                 Reject
               </button>
-              <p
-              className={`product-status ${
-                productStatuses[index] === "Accepted"
-                  ? "accepted"
-                  : "rejected"
-              }`}
-            >
-              {productStatuses[index] || ""}
-            </p>
             </div>
+            <OverlayTrigger
+        trigger="click"
+        placement="bottom"
+        overlay={popover}
+        onToggle={() => setSelectedData(product)}
+      >
+       <div className="d-flex align-items-center justify-content-end mt-3 cursor-pointer">
+       <p style={{color: "rgb(8, 86, 175)", cursor:"pointer"}}>Click here for more details</p>
+       </div>
+      </OverlayTrigger>
           </div>
         ))
       ) : (
@@ -200,7 +301,7 @@ const ProductVerifySimplified = ({ products }) => {
             <div className="popup-actions">
               <button
                 className="btn submit-btn"
-                onClick={handleRejectConfirm}
+                onClick={() => handleRejectConfirm(18)}
                 disabled={!rejectionReason.trim()}
               >
                 Submit

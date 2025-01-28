@@ -71,7 +71,7 @@ export default function Home() {
     
 
   return (
-<AdminDashboard userType={userType} fetchCategories={fetchCategories}/> 
+<AdminDashboard userType={userType} fetchCategories={fetchCategories} /> 
   )
     
 }

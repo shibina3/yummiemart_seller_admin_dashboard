@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../../Context/UserContext";
 import Select from "react-select";
 import { ReactComponent as DeleteIcon }from '../../assets/Delete.svg';
+import { Popover, OverlayTrigger } from 'react-bootstrap';
 
 
 const AllProducts = ({ products }) => {
@@ -9,6 +10,7 @@ const AllProducts = ({ products }) => {
   const [storeOption, setStoreOption] = useState({value : "1" , label : "Saravana Stores"})
   const [productList, setProductList] = useState([]);
   const [allProducts, setAllProducts] = useState([]); // Backup of all products
+  const [selectedData, setSelectedData] = useState(null);
   const { categories, userType, stores } = useContext(UserContext);
 
   const handleSelectChange = (option) => {
@@ -37,7 +39,7 @@ const AllProducts = ({ products }) => {
           headers: {
             "Content-Type": "application/json",
           },
-            body: JSON.stringify({ category: selectedOption.label, path: "/get/products" }),
+            body: JSON.stringify({ category: selectedOption.label, path: "/get/verified/products" }),
         });
         const {body} = await response.json();
         setAllProducts(body);
@@ -79,6 +81,74 @@ const AllProducts = ({ products }) => {
           );
           setProductList(storeFilteredProducts);
         };
+
+        const popover = (
+          <Popover id="custom-popover" style={{ maxWidth: '500px', width: '500px', inset: "0px auto 40px 0px",
+            height: "max-content" }}>
+            <Popover.Header as="h3" className="d-flex align-items-center justify-content-between">
+              {selectedData?.name || 'No Title'}
+              <img
+              src={'https://www.shutterstock.com/shutterstock/photos/2402573215/display_1500/stock-photo-udine-italy-december-nutella-jar-of-chocolate-spreadable-cream-isolated-white-background-2402573215.jpg'}
+              alt={selectedData?.name}
+              style={{
+                width: "50px",
+                height: "auto",
+                borderRadius: "8px",
+                marginBottom: "12px",
+              }}
+            />
+              </Popover.Header>
+            <Popover.Body>
+              {selectedData?.description || 'No Description Available'}
+              <br />
+<div className="d-flex align-items-start justify-content-between mt-2">
+<p className="mb-1">
+store_id : <b>{selectedData?.store_id || 'N/A'}</b>
+</p>
+<p className="mb-1">
+mrp : <b>{selectedData?.mrp || 'N/A'}</b>
+</p>
+</div>
+
+<div className="d-flex align-items-start justify-content-between">
+<p className="mb-1">
+yummy_price : <b>{selectedData?.yummy_price || 'N/A'}</b>
+</p>
+<p className="mb-1">
+is_admin_verified : <b>{selectedData?.is_admin_verified || 'N/A'}</b>
+</p>
+</div>
+
+<div className="d-flex align-items-start justify-content-between">
+<p className="mb-1">
+allow_get_quote : <b>{selectedData?.allow_get_quote || 'N/A'}</b>
+</p>
+<p className="mb-1">
+max_quantity : <b>{selectedData?.max_quantity || 'N/A'}</b>
+</p>
+</div>
+
+<div className="d-flex align-items-start justify-content-between">
+<p className="mb-1">
+min_quantity : <b>{selectedData?.min_quantity || 'N/A'}</b>
+</p>
+<p className="mb-1">
+min_b2b_quantity : <b>{selectedData?.min_b2b_quantity || 'N/A'}</b>
+</p>
+</div>
+
+<div className="d-flex align-items-start justify-content-between">
+<p className="mb-1">
+admin_comments : <b>{selectedData?.admin_comments || 'N/A'}</b>
+</p>
+<p className="mb-1">
+verification_status : <b>{selectedData?.verification_status || 'N/A'}</b>
+</p>
+</div>
+
+            </Popover.Body>
+          </Popover>
+        );
         
   return (
     <div>
@@ -244,6 +314,16 @@ const AllProducts = ({ products }) => {
                           >{product.stock}
                           </p>
                           </div>
+                          <OverlayTrigger
+        trigger="click"
+        placement="bottom"
+        overlay={popover}
+        onToggle={() => setSelectedData(product)}
+      >
+       <div className="d-flex align-items-center justify-content-end mt-3 cursor-pointer">
+       <p style={{color: "rgb(8, 86, 175)", cursor:"pointer"}}>Click here for more details</p>
+       </div>
+      </OverlayTrigger>
           </div>
         ))}
       </div>

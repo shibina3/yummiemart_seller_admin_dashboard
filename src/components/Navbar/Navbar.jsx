@@ -1,4 +1,5 @@
 import React from 'react';
+import { ReactComponent as Profile }from '../../assets/Profile.svg';
 import "./styles.css"
 
 const Navbar = () => {
@@ -8,8 +9,9 @@ const Navbar = () => {
                 <a href="/">Yummie Mart</a>
             </div>
 
-            <div className="navbar-user">
-                <p>{localStorage.getItem("userName")}</p>
+            <div className="navbar-user d-flex align-items-center" style={{gap: "10px"}}> 
+              <Profile width={40} height={40}/>
+                <p className='mb-0'>{localStorage.getItem("userName")}</p>
             </div>
         </nav>
     );

@@ -70,108 +70,83 @@ const VerifySeller = () => {
   };
 
   const getSellerDetails = async () => {
-    try {
-      const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ path: "/get/submitted-sellers" }),
-      });
-      const {body} = await response.json();
-      setSellerData(body);
-    } catch (error) {
-      console.error("Error: ", error);
-    }
+if(isToggled){
+  try {
+    const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ path: "/get/verified/sellers" }),
+    });
+    const {body} = await response.json();
+    setSellerData(body);
+  } catch (error) {
+    console.error("Error: ", error);
+  }
+}else{
+  try {
+    const response = await fetch("https://akk31sm8ig.execute-api.us-east-1.amazonaws.com/default", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ path: "/get/submitted-sellers" }),
+    });
+    const {body} = await response.json();
+    setSellerData(body);
+  } catch (error) {
+    console.error("Error: ", error);
+  }
+}
   };
 
-  useEffect(() => { getSellerDetails(); }, []);
-
+  useEffect(() => { getSellerDetails(); }, [isToggled]);
+  
   return <>
   <ToggleSwitch isToggled={isToggled} toggleHandler={toggleHandler}/>
-{
-  isToggled ? (
     <div style={styles.container}>
     {sellerData.length > 0 ? sellerData.map((seller, index) => (
       <div key={index} style={styles.section}>
         <div style={styles.header} onClick={() => toggleAccordion(index)}>
           <span style={styles.headerText}>{seller.name || 'Company Name'}</span>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-
-<button
-style={{
-  ...styles.iconButton,
-  color: 'green',
-  fontWeight: 500,
-  fontSize : '16px',
-}}
->
-Verified Seller
-</button>
-
-          </div>
-        </div>
-
-        {expandedAccordionIndex === index && (
-          <div style={styles.content}>
-            {Object.entries(seller).map(([key, value]) => {
-              // Show certificates conditionally based on `seller_type`
-              if (
-                (key === 'dealer_cert_url' && seller.seller_type !== 'dealer') ||
-                (key === 'distributor_cert_url' && seller.seller_type !== 'distributor')
-              ) {
-                return null;
-              }
-
-              return (
-                <div key={key} style={styles.fieldContainer}>
-                  <div style={styles.fieldKey}>{formatKey(key)}</div>
-                  <div style={styles.fieldValue}>{ value === true ? 'true' : value === false ? 'false' : value}</div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    )) : 
-    <div>No sellers to verify</div>
-    }
-  </div>
-  ) : (
-    <div style={styles.container}>
-    {sellerData.length > 0 ? sellerData.map((seller, index) => (
-      <div key={index} style={styles.section}>
-        <div style={styles.header} onClick={() => toggleAccordion(index)}>
-          <span style={styles.headerText}>{seller.name || 'Company Name'}</span>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-<button
-style={{
-  ...styles.iconButton,
-  color: 'red',
-  cursor: 'pointer',
-}}
-onClick={(e) => {
-  e.stopPropagation();
-  handleReject(seller);
-}}
->
-Reject
-</button>
-<button
-style={{
-  ...styles.iconButton,
-  color: 'green',
-  cursor : 'pointer',
-}}
-onClick={(e) => {
-  e.stopPropagation();
-  handleAcceptApiCall(seller, index);
-}}
->
-Accept
-</button>
-
-          </div>
+          
+          {
+            isToggled ? 
+            (
+          <p className='mb-0' style={{color:'green'}}>Accepted</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+              <button
+              style={{
+                ...styles.iconButton,
+                color: 'red',
+                cursor: 'pointer',
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleReject(seller);
+              }}
+              >
+              Reject
+              </button>
+              <button
+              style={{
+                ...styles.iconButton,
+                color: 'green',
+                cursor : 'pointer',
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAcceptApiCall(seller, index);
+              }}
+              >
+              Accept
+              </button>   
+              </div>     
+            )
+          }
+          
         </div>
 
         {expandedAccordionIndex === index && (
@@ -226,8 +201,7 @@ Accept
       </div>
     )}
   </div>
-  )
-}
+
     </>
 };
 
