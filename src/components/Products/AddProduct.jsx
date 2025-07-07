@@ -88,7 +88,7 @@ const stockDetails = [
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
       <h2>Add Product</h2>
-      <form onSubmit={handleSubmit} style={{ maxHeight: "680px", overflowY: "scroll" }}>
+      <form onSubmit={handleSubmit} style={{ maxHeight: "680px", overflowY: "visible" }}>
         <div style={{ marginBottom: "15px" }}>
           <label>Product Name:</label>
           <input

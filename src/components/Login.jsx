@@ -28,7 +28,13 @@ function Login() {
     const { body } = await response.json();
     if( ["seller", "admin"].includes(body.userType) && !body.isNewUser ) {
         localStorage.setItem("mobile", mobile);
-        navigate("/verify-sellers");
+        if(body.userType === "admin") {
+          navigate("/verify-sellers");
+          window.location.reload();
+        } else {
+          navigate("/add-product");
+          window.location.reload();
+        }
     } else {
         alert("You are not authorized to login! Install the app and Become a Seller or Admin.");
     }

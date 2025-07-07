@@ -203,9 +203,11 @@ const ShowProducts = () => {
             </div>
             <OverlayTrigger
               trigger="click"
-              placement="bottom"
+              placement="top"
               overlay={popover}
+              rootClose={true}
               onToggle={() => setSelectedData(product)}
+
             >
               <div className="d-flex align-items-center justify-content-end mt-3 cursor-pointer">
                 <p style={{ color: "rgb(8, 86, 175)", cursor: "pointer" }}>Click here for more details</p>
